@@ -69,3 +69,8 @@ do not replace native macOS/Windows installation or real-Claude acceptance.
 
 Reproduce the isolated Linux skill/helper checks with `python3 tests/check.py`
 (Node.js/npm must supply `npx`).
+
+The preview site is deployed at [talk.aiherd.dev](https://talk.aiherd.dev).
+The static deployment lives on `gh-pages`; keep skill sources on `main`.
+To verify the documented public GitHub installation rather than a local copy,
+run `AIH_TALK_SKILL_SOURCE=aiherd-dev/talk python3 tests/check.py`.
