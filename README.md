@@ -1,7 +1,7 @@
 # AIHerd Talk website
 
 Compiled static app for https://talk.aiherd.dev.
-AIHerd source revision: af8ea8c2fa8b3aa7f5cd2e264d3134e5337ab9ab
+AIHerd source revision: e25c8fe8082e8aac0aae608e52f7ea037ce04029
 
 The main branch owns the Claude skill. This branch contains only public static
 assets; invitation keys and conversations stay in browser/owner memory.
