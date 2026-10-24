@@ -1,12 +1,15 @@
 ---
 name: talk-to-my-claude
-description: Enter answering mode in this existing Claude Code conversation and invite trusted guests to ask questions through talk.aiherd.dev.
+description: Enter answering mode in this existing Claude Code or Codex conversation and invite trusted guests to ask questions through talk.aiherd.dev.
 disable-model-invocation: true
 ---
 
-Enter answering mode in **this conversation** for the owner's topic: $ARGUMENTS.
+Enter answering mode in **this conversation** for the owner's supplied topic.
+In Claude Code, invoke `/talk-to-my-claude <topic>`; in Codex, invoke
+`$talk-to-my-claude <topic>`. The installed name is retained for compatibility.
 Do not fork, start `claude -p`, resume the session in another process, or call a
-model API. Answers must use the conversation the owner invoked this skill in.
+model API, `codex exec`, or a second Codex conversation. Answers must use the
+conversation the owner invoked this skill in.
 
 1. Read [remote-setup.md](references/remote-setup.md). Detect the platform,
    install the standard AIHerd distribution if missing, select one protected
@@ -19,7 +22,7 @@ model API. Answers must use the conversation the owner invoked this skill in.
    Windows before starting installation or login.
 2. Explain that one invitation is one room; everyone holding it can read and
    contribute. This session enters answering mode and the owner pays normal
-   Claude usage. Claude may disclose existing context in its answers; share
+   usage of the current assistant. Answers may disclose existing context; share
    only with trusted guests. Earlier transcript/tool output is not published
    automatically. This is a question-answering policy, not tool isolation.
 3. Choose a public title and description from the owner's stated topic. Do not
@@ -30,14 +33,14 @@ model API. Answers must use the conversation the owner invoked this skill in.
    Use safely quoted arguments or a subprocess argument array. The command
    returns JSON containing `url` and `room.id`. Require `room.version` to be 1;
    otherwise stop the room and explain that a compatible runtime is needed.
-   Print the description, expiry,
-   and complete invitation URL to the owner. Warn if OS isolation is unavailable.
+   Print the description, expiry, and complete invitation URL to the owner. Warn if OS isolation is unavailable.
    Invocation authorizes creating the invitation; incoming questions need no
    repeated owner approval. Do not log or persist the capability URL.
 4. Run `aih talk next <room.id> --socket <endpoint>` **without `--deadline`**.
-   Retain this exact running command as a managed background Bash task, then
-   await its completion using the runtime's task-completion mechanism. Reuse
-   the same task ID while waiting. Do not restart it, return periodic idle
+   First read [controller-runtime.md](references/controller-runtime.md) for the
+   current agent. Retain this exact running command through the agent's managed
+   process/completion tools and await that same command. Reuse its task/session
+   ID while waiting. Do not restart it, return periodic idle
    messages, or poll the broker every 45 seconds. A friend may take several
    minutes to type. If the runtime cannot preserve one blocking command,
    explain that limitation and stop the room; do not promise unattended use.
@@ -66,6 +69,6 @@ model API. Answers must use the conversation the owner invoked this skill in.
 
 The broker publishes completed answers, not token streams. A lost browser
 connection does not cancel a question. A failed controller command does not
-justify creating another model session. Real-Claude context continuity and
-long-wait acceptance must pass before this skill is advertised as released;
+justify creating another model session. Real-agent context continuity and
+long-wait acceptance must be checked separately for Claude Code and Codex;
 see the repository's acceptance instructions.

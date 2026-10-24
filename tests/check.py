@@ -3,8 +3,8 @@ source=pathlib.Path(__file__).resolve().parents[1]
 with tempfile.TemporaryDirectory(prefix='aih-talk-skill-install-') as directory:
     rig=pathlib.Path(directory); project=rig/'project';project.mkdir();home=rig/'home';home.mkdir()
     env=os.environ|{'HOME':str(home),'DISABLE_TELEMETRY':'1','npm_config_cache':str(rig/'npm-cache')}
-    for global_scope in (False,True):
-        argv=['npx','--yes','skills','add',os.environ.get('AIH_TALK_SKILL_SOURCE',str(source)),'--skill','talk-to-my-claude','--agent','claude-code','--copy','--yes']
+    for agent,global_scope in [(a,g) for a in ('claude-code','codex') for g in (False,True)]:
+        argv=['npx','--yes','skills','add',os.environ.get('AIH_TALK_SKILL_SOURCE',str(source)),'--skill','talk-to-my-claude','--agent',agent,'--copy','--yes']
         if global_scope:argv.append('--global')
         result=subprocess.run(argv,cwd=project,env=env,capture_output=True,text=True,timeout=120)
         assert result.returncode==0,result.stderr
@@ -15,6 +15,8 @@ with tempfile.TemporaryDirectory(prefix='aih-talk-skill-install-') as directory:
             assert root.read_text()==(source/'skills/talk-to-my-claude/SKILL.md').read_text()
             assert (folder/'references/remote-setup.md').is_file()
             assert (folder/'scripts/reply.py').is_file()
+            assert (folder/'references/controller-runtime.md').is_file()
+            assert (folder/'agents/openai.yaml').is_file()
             assert not any(p.is_symlink() for p in folder.rglob('*'))
     # Exercise the real helper's subprocess argument/data boundary and private-file lifecycle.
     executable=rig/'mock-aih'

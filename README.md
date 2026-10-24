@@ -1,6 +1,6 @@
 # Talk to my Claude
 
-Claude Code skill for inviting trusted guests to ask questions in your existing
+Claude Code and Codex skill for inviting trusted guests to ask questions in your existing
 conversation at talk.aiherd.dev. The broker runtime is `aih talk` in the standard
 [AIHerd distribution](https://github.com/aiherd-dev/aiherd); this repository owns
 the skill and its setup references. No second copy belongs in AIHerd.
@@ -14,6 +14,12 @@ Install into the current project:
 ```sh
 npx skills add aiherd-dev/talk --skill talk-to-my-claude --agent claude-code --copy
 ```
+
+For Codex, replace `--agent claude-code` with `--agent codex`, then invoke
+`$talk-to-my-claude <public topic>` in your existing Codex conversation. The
+historical skill name is kept for compatibility; replies come from the agent
+whose conversation you invoked it in. Codex instructions and invocation policy
+ship with the same skill directory.
 
 Append `--global` for all projects. Installation copies the entire skill directory,
 including references and the reply helper, without starting a room, daemon,
@@ -33,10 +39,10 @@ npx skills add /absolute/path/to/talk --skill talk-to-my-claude --agent claude-c
 Use a disposable project and an isolated, explicitly marked scratch herd with
 its own config, socket, credentials and secret-free attribution manifest, as
 required by AIHerd's AGENTS.md. Never use the owner's running herd for tests.
-Record the exact Claude Code version; no version has passed the real-session
-gate in this implementation environment, where Claude Code is unavailable.
+Record the exact host and model version. The Codex run below has passed;
+Claude Code remains untested in this environment.
 
-1. Tell Claude a random fact in the original conversation, invoke the skill,
+1. Tell the agent a random fact in the original conversation, invoke the skill,
    and ask about it through the browser. Verify the answer uses that fact,
    while earlier transcript, files and tool output never appear automatically.
 2. Keep the same `next` command pending beyond both 45 and 90 seconds, then
@@ -74,3 +80,26 @@ The preview site is deployed at [talk.aiherd.dev](https://talk.aiherd.dev).
 The static deployment lives on `gh-pages`; keep skill sources on `main`.
 To verify the documented public GitHub installation rather than a local copy,
 run `AIH_TALK_SKILL_SOURCE=aiherd-dev/talk python3 tests/check.py`.
+
+## Real Codex acceptance — 2026-10-24
+
+Passed on Linux with Codex CLI 0.164.0 and GPT-6.1-Sol in a new interactive tmux
+session, with the skill installed using `--agent codex --copy`. The session used
+its normal ChatGPT sign-in; apps/plugins were disabled for this fixture. The
+herd and relay were isolated, explicitly marked scratch, with no borrowed herd
+configuration or credentials.
+
+A fact supplied in an owner turn before skill invocation informed the answer
+to a real browser question, and a follow-up used the same conversation. One
+receive command remained alive for over 219 seconds before the first question.
+The agent refused a guest request to edit a canary file, the owner-only note was
+absent from the guest transcript, and browser reload preserved the six intended
+messages. Owner interruption cancelled the pending receive, revoked the room,
+and returned to ordinary conversation while retaining the original fact.
+
+Codex awaits its retained command through managed execution cells. Those cells
+can yield and require another tool-level wait; this check establishes live
+availability/context continuity, not a zero-usage indefinite background service.
+It also does not prove model-level prompt-injection resistance or native macOS/
+Windows behavior. The original Codex conversation can stay open after the
+scratch herd and relay are stopped.
