@@ -40,7 +40,9 @@ sys.exit(int(os.environ.get('REPLY_TEST_NEXT_FAILURE', '0')))
 ''' % sys.executable)
         self.mock.chmod(0o700)
         self.value = dict(request_id='1'*32, lease='a'*64, generation=1,
-                          text='Literal $(false) and `false`\nשלום 你好')
+                          text='# שלום / مرحبا\n\nLiteral $(false) and `false`\n你好\n\n'
+                               '| שם | value |\n| --- | --- |\n| שלום | `a\\b` |\n\n'
+                               '```mermaid\nflowchart RL\n A["שלום"] --> B["مرحبا"]\n```\n')
 
     def launch(self, next=True, **env):
         p = subprocess.Popen([sys.executable, str(HELPER), '--aih', str(self.mock),
