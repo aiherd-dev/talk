@@ -29,8 +29,9 @@ this skill in.
    only when status confirms the selected herd is stopped. A probe error is not
    a stopped herd. Preserve the status response's endpoint on every command.
    Connect that same herd if needed, following the setup reference. Never
-   replace or stop an existing herd or its sidecars. V1 broker commands require
-   Unix; explain this on Windows before starting installation or login.
+   replace or stop an existing herd or its sidecars. On Windows preserve the
+   named-pipe endpoint and explain unavailable OS isolation; `required` mode is
+   unsupported there.
 2. Explain that one invitation is one room; everyone holding it can read and
    contribute. This session enters answering mode and the owner pays normal
    usage of the current assistant. Answers may disclose existing context; share

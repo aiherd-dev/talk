@@ -7,10 +7,13 @@ installation itself starts no service or login.
 
 ## Check the existing herd first
 
-Find `aih` with `command -v aih`. If PATH is incomplete, check the usual installed
-locations below and use the actual executable path in every command. V1 talk
-requires Unix; explain the unsupported broker on Windows before installation
-or login.
+Find `aih` with `command -v aih` on Unix or `Get-Command aih` in PowerShell. If PATH is incomplete, check the usual installed
+locations below and use the actual executable path in every command. Windows
+uses named pipes; preserve the returned endpoint exactly, including backslashes.
+A LocalService herd requires an elevated CLI. Windows supports the default
+`--sandbox auto` mode with isolation reported as unavailable; explain that status.
+If the owner requires OS isolation, stop because Windows does not support
+`--sandbox required`. Do not represent a supervised process as an OS sandbox.
 
 Honor an owner-selected `--socket` endpoint. Otherwise run:
 
@@ -54,6 +57,12 @@ Never replace/restart an existing herd or change its sidecars for this skill.
   `curl -fsSL https://aiherd.dev/install.sh | bash`, and add `$HOME/.local/bin`
   to this command's PATH. The installer may start a user service: return to
   `aih status --json` and reuse it before considering `aih serve`.
+
+- Windows: also check `$env:ProgramFiles\AIHerd\aih.exe`. If missing, use the
+  standard Windows installer linked from <https://aiherd.dev/?platform=windows>.
+  It needs an elevated PowerShell window and installs the normal service. Return
+  to `aih status --json` afterward; do not create a second herd. An older build
+  without `aih talk` needs an update; do not claim an unreleased build is packaged.
 
 ## Connect the selected running herd if needed
 

@@ -28,8 +28,9 @@ ship with the same skill directory.
 Append `--global` for all projects. Installation copies the entire skill directory,
 including references and the reply helper, without starting a room, daemon,
 login or model conversation. Invoke `/talk-to-my-claude <public topic>` in your
-existing Claude Code session. V1 runtime requires Unix and Python 3. Windows
-skill installation is supported by the Skills CLI; Windows broker use is pending.
+existing Claude Code session. The runtime supports Unix and Windows and needs Python 3. Windows uses private
+named pipes and a supervised worker; OS isolation is unavailable there, and
+`--sandbox required` refuses startup.
 
 For development, install from this local repository path instead of the GitHub
 shorthand. For example, from an isolated project directory:
@@ -84,7 +85,7 @@ does not start sharing.
 Both [omp](https://github.com/can1357/oh-my-pi/blob/main/docs/context-files.md)
 and [OpenCode](https://opencode.ai/docs/rules/) support project AGENTS.md
 instructions. The generic entry point reuses the same skill, setup reference
-and reply helper as Claude Code and Codex. It requires Unix, Python 3, an AIHerd
+and reply helper as Claude Code and Codex. It requires Python 3, an AIHerd
 build with `aih talk`, and a host that can retain and await a blocking command
 while allowing owner interruption. Real omp/OpenCode runtime acceptance is
 pending; if a host cannot do this, the instructions stop the room and explain.
@@ -113,7 +114,8 @@ Claude Code remains untested in this environment.
    pending/failed login and reconnection. Existing herds and sidecars stay running.
 5. Test project and global Skills CLI installation on Windows, Linux and macOS,
    checking supporting resources and explicit invocation. On Windows, runtime
-   setup must explain the unsupported broker rather than creating a false link.
+   setup must preserve the named-pipe endpoint, report unavailable OS isolation,
+   and refuse `required` mode. Verify private reply-file ACLs and cleanup.
 
 The deterministic protocol and browser acceptance live in AIHerd's
 `tests/talk_e2e.py` and `talk-web/src/*.test.*`; they do not prove Claude context
