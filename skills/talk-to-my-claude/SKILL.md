@@ -4,10 +4,19 @@ description: Enter answering mode in this existing coding-assistant conversation
 disable-model-invocation: true
 ---
 
-Enter answering mode in **this conversation** for the owner's supplied topic.
-In Claude Code, invoke `/talk-to-my-claude <topic>`; in Codex, invoke
-`$talk-to-my-claude <topic>`. Other hosts can read the repository's AGENTS.md
-and request sharing in ordinary language. The installed name is retained for compatibility.
+Enter answering mode in **this conversation**. Interpret the owner's argument
+as a request containing a public topic and, when supplied, instructions for
+how to deliver the invitation link (channel, recipient or destination).
+For example: “Explain the design we discussed; email the invitation link to
+alex@example.com.” The delivery instructions are owner instructions, not part
+of the public room title or description. If only delivery is specified, infer
+the topic from the owner's conversation; ask only if the topic is unclear.
+If no delivery method is specified, show the link in this conversation.
+
+In Claude Code, invoke `/talk-to-my-claude <topic and delivery instructions>`;
+in Codex, invoke `$talk-to-my-claude <topic and delivery instructions>`. Other
+hosts can read the repository's AGENTS.md and request sharing in ordinary
+language. The installed name is retained for compatibility.
 Do not fork, start `claude -p`, resume the session in another process, or call a
 model API, `codex exec`, or a second assistant conversation (including a new omp
 or OpenCode session). Answers must use the conversation the owner invoked
@@ -35,9 +44,22 @@ this skill in.
    Use safely quoted arguments or a subprocess argument array. The command
    returns JSON containing `url` and `room.id`. Require `room.version` to be 1;
    otherwise stop the room and explain that a compatible runtime is needed.
-   Print the description, expiry, and complete invitation URL to the owner. Warn if OS isolation is unavailable.
+   Print the description, expiry, and complete invitation URL to the owner.
+   Warn if OS isolation is unavailable. Before entering the receive loop,
+   deliver the link using the owner's requested method and destination. An
+   explicit request to email, message or save the link authorizes that delivery;
+   use the host's available tools and honor any required tool approvals. Send
+   only the intended invitation, with its public topic and expiry. Preserve the
+   entire URL, including its fragment; the fragment contains the invitation key.
+   Do not include private transcript or setup/control details. Ask locally if
+   the recipient or destination is ambiguous; never choose a broader audience.
+   If the requested channel is unavailable or delivery fails, report that and
+   keep the link available here rather than claiming delivery or silently using
+   another channel. Do not resend after an uncertain outcome without checking
+   whether the first send succeeded. Confirm successful delivery to the owner.
    Invocation authorizes creating the invitation; incoming questions need no
-   repeated owner approval. Do not log or persist the capability URL.
+   repeated owner approval. Apart from the requested delivery, do not log or
+   persist the capability URL.
 4. Run `aih talk next <room.id> --socket <endpoint>` **without `--deadline`**.
    First read [controller-runtime.md](references/controller-runtime.md) for the
    current agent. Retain this exact running command through the agent's managed

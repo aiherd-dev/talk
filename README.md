@@ -38,6 +38,22 @@ shorthand. For example, from an isolated project directory:
 npx skills add /absolute/path/to/talk --skill talk-to-my-claude --agent claude-code --copy
 ```
 
+## Specify how to deliver the invitation
+
+The skill argument includes both the topic and how to send the link:
+
+```text
+/talk-to-my-claude Explain the design we discussed; email the invitation link to alex@example.com.
+$talk-to-my-claude Explain the design we discussed; send the invitation link to Slack channel #design-review.
+```
+
+Delivery uses tools available in your current assistant. Include the channel and
+recipient or destination; if omitted, the link is shown in your conversation.
+Delivery details stay out of the public room description. If the channel is
+unavailable, the assistant reports that and shows the link for manual sharing.
+The same instructions work in the ordinary-language requests below, for example
+by appending “and email the invitation link to alex@example.com.”
+
 ## Generic AGENTS.md instructions: omp and OpenCode
 
 Clone the instructions and their helper into your project without replacing

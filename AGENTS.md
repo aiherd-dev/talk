@@ -18,3 +18,8 @@ owner interruption, explain the limitation and stop the room.
 An owner request such as “Read .aiherd-talk/AGENTS.md and use it to invite guests
 to ask about the design we just discussed” activates this workflow. Stop sharing
 when the owner asks, and return to the ordinary conversation.
+
+The request can also specify how to send the invitation, for example “and email
+the invitation link to alex@example.com.” Follow that delivery instruction
+before waiting for questions; if none is supplied, show the link here. Keep
+channel and recipient details out of the public room title and description.

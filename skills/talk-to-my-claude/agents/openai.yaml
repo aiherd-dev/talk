@@ -1,6 +1,6 @@
 interface:
   display_name: "Talk to my assistant"
   short_description: "Invite trusted guests into this agent conversation"
-  default_prompt: "Use $talk-to-my-claude to share this conversation for questions about the topic I provide."
+  default_prompt: "Use $talk-to-my-claude to share this conversation for questions about the topic I provide, and deliver the invitation link using my specified channel and destination."
 policy:
   allow_implicit_invocation: false
