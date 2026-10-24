@@ -13,7 +13,7 @@ with tempfile.TemporaryDirectory(prefix='aih-talk-skill-install-') as directory:
         for root in roots:
             folder=root.parent
             assert root.read_text()==(source/'skills/talk-to-my-claude/SKILL.md').read_text()
-            assert (folder/'references/remote-setup.md').is_file()
+            assert (folder/'references/setup.md').is_file()
             assert (folder/'scripts/reply.py').is_file()
             assert (folder/'references/controller-runtime.md').is_file()
             assert (folder/'agents/openai.yaml').is_file()

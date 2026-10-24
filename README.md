@@ -5,8 +5,12 @@ conversation at talk.aiherd.dev. The broker runtime is `aih talk` in the standar
 [AIHerd distribution](https://github.com/aiherd-dev/aiherd); this repository owns
 the skill and its setup references. No second copy belongs in AIHerd.
 
-This is a preview release. It requires an AIHerd build with `aih talk` support;
-standard packaged versions may predate that command. The site and skill are
+The skill checks `aih status --json` first and reuses your connected AIHerd.
+There is one standard `aih` installation; a remote-only package is not required.
+
+This is a preview release. It requires an AIHerd build with `aih talk` and
+`aih status` support; standard packaged versions may predate these commands.
+The site and skill are
 available for testing, while real-Claude and native macOS acceptance remain pending.
 
 Install into the current project:
@@ -51,10 +55,11 @@ Claude Code remains untested in this environment.
    task completion path. Interrupt as the owner and confirm the wait exits.
 3. Ask sequential questions; follow-up answers use prior talk turns. Verify
    owner-only instructions stay local. Stop sharing and return to ordinary work.
-4. Test clean standard-package setup on macOS and Linux with both an existing
-   gateway and none. With none, the skill starts `aih serve` without `aih-tty`,
-   completes actual browser login and verifies relay connection. Test pending
-   and failed login. Existing gateway and sidecars remain running.
+4. Test standard-package setup on macOS and Linux with an existing connected
+   herd, a disconnected herd, and none. The skill first reads `aih status --json`
+   and reuses a connected herd without installation, startup or login. Only a
+   confirmed stopped herd needs `aih serve` without `aih-tty`. Test probe errors,
+   pending/failed login and reconnection. Existing herds and sidecars stay running.
 5. Test project and global Skills CLI installation on Windows, Linux and macOS,
    checking supporting resources and explicit invocation. On Windows, runtime
    setup must explain the unsupported broker rather than creating a false link.

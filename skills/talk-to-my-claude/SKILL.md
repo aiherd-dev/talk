@@ -11,15 +11,15 @@ Do not fork, start `claude -p`, resume the session in another process, or call a
 model API, `codex exec`, or a second Codex conversation. Answers must use the
 conversation the owner invoked this skill in.
 
-1. Read [remote-setup.md](references/remote-setup.md). Detect the platform,
-   install the standard AIHerd distribution if missing, select one protected
-   gateway endpoint, probe it and reuse it if responsive. Otherwise start
-   `aih serve` as a managed background command **without `--terminal`** and
-   wait for readiness. Preserve that endpoint on every subsequent command.
-   Check sign-in and relay connection against that running gateway. Complete
-   the owner's browser sign-in if needed. Never replace or stop an existing
-   gateway or its sidecars. V1 broker commands require Unix; explain this on
-   Windows before starting installation or login.
+1. Read [setup.md](references/setup.md). Use the existing standard `aih`
+   executable and run `aih status --json` first (with the owner's `--socket`
+   when specified). Reuse a connected herd immediately, skipping installation,
+   startup and login. Install standard AIHerd only if missing; start `aih serve`
+   only when status confirms the selected herd is stopped. A probe error is not
+   a stopped herd. Preserve the status response's endpoint on every command.
+   Connect that same herd if needed, following the setup reference. Never
+   replace or stop an existing herd or its sidecars. V1 broker commands require
+   Unix; explain this on Windows before starting installation or login.
 2. Explain that one invitation is one room; everyone holding it can read and
    contribute. This session enters answering mode and the owner pays normal
    usage of the current assistant. Answers may disclose existing context; share
@@ -64,8 +64,8 @@ conversation the owner invoked this skill in.
 7. Return to step 4 after the reply. On owner interruption, stop, error or exit,
    cancel the retained `next` task and run `aih talk stop <room.id> --socket <endpoint>`.
    If a claim expires, start a new room only at the owner's direction; do not
-   redeliver automatically. Terminate a gateway only if this invocation started
-   it and the owner wants it stopped. Never stop a pre-existing gateway.
+   redeliver automatically. Terminate a herd only if this invocation started
+   it and the owner wants it stopped. Never stop a pre-existing herd.
 
 The broker publishes completed answers, not token streams. A lost browser
 connection does not cancel a question. A failed controller command does not
