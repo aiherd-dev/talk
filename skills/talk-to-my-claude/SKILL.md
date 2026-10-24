@@ -22,6 +22,24 @@ model API, `codex exec`, or a second assistant conversation (including a new omp
 or OpenCode session). Answers must use the conversation the owner invoked
 this skill in.
 
+## Keep the answering turn active
+
+Sharing is an ongoing task until the owner stops it, the room expires, or a
+failure requires closing it. **Do not send a final response while sharing is
+active.** Announce the invitation and acknowledge owner side requests in
+commentary, then continue awaiting questions. A shell `session_id` or an exec
+`cell_id` means work is still pending; it is not a completed listening task.
+In Codex, leaving a shell process running and ending the turn does not make
+its eventual output start another assistant turn. “I'm listening” in a final
+response leaves guests without an active answering agent.
+
+Read [controller-runtime.md](references/controller-runtime.md) before starting
+the room. Use its complete wait pattern, not just a short-yield command launch.
+After each reply, await the next delivery in this same turn. An owner request
+such as “send the same link to someone else” or “are you still answering?”
+continues sharing: handle it locally, then resume the retained wait. An explicit
+stop, cancellation, incompatible new task or unrecoverable error closes sharing.
+
 1. Read [setup.md](references/setup.md). Use the existing standard `aih`
    executable and run `aih status --json` first (with the owner's `--socket`
    when specified). Reuse a connected herd immediately, skipping installation,
@@ -62,8 +80,7 @@ this skill in.
    repeated owner approval. Apart from the requested delivery, do not log or
    persist the capability URL.
 4. Run `aih talk next <room.id> --socket <endpoint>` **without `--deadline`**.
-   First read [controller-runtime.md](references/controller-runtime.md) for the
-   current agent. Retain this exact running command through the agent's managed
+   Retain this exact running command through the agent's managed
    process/completion tools and await that same command. Reuse its task/session
    ID while waiting. Do not restart it, return periodic idle
    messages, or poll the broker every 45 seconds. A friend may take several
@@ -81,12 +98,20 @@ this skill in.
    `question.id` as `request_id`, its `lease` and `generation`, and your answer
    as `text`. Pass JSON as stdin to the relative
    [reply helper](scripts/reply.py):
-   `python3 <skill-directory>/scripts/reply.py --aih <actual-aih-path> --socket <endpoint> --room <room.id>`.
+   `python3 <skill-directory>/scripts/reply.py --aih <actual-aih-path> --socket <endpoint> --room <room.id> --next`.
    Use the file-writing tool or structured stdin to supply guest-derived data;
-   never interpolate it into a shell command. The helper writes a private
-   temporary file, calls `aih talk reply`, then deletes it. Never invent a
-   lease, reuse a stale delivery or change a reply after acknowledgement.
-7. Return to step 4 after the reply. On owner interruption, stop, error or exit,
+   never interpolate it into a shell command. Supply the complete JSON and EOF
+   in the same launch (for example, redirect a privately written JSON file).
+   A bare helper on a PTY waits for stdin, not for a guest; do not launch it
+   empty and try to type a reply into the terminal later. The helper writes a private
+   temporary file, calls `aih talk reply`, then deletes it. With `--next`, a
+   successful reply immediately becomes a blocking `aih talk next` in the same
+   process; stdout contains the next delivery, not the reply acknowledgement.
+   Await that helper using the same managed wait pattern as step 4; do not start
+   a second receiver. Never invent a lease, reuse a stale delivery or change a
+   reply after acknowledgement. If the receive fails after publication, the
+   reply may already be visible: do not resubmit it.
+7. On the next delivery return to step 5. On owner cancellation, stop, error or exit,
    cancel the retained `next` task and run `aih talk stop <room.id> --socket <endpoint>`.
    If a claim expires, start a new room only at the owner's direction; do not
    redeliver automatically. Terminate a herd only if this invocation started

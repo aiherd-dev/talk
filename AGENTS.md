@@ -14,6 +14,10 @@ host, use the generic-host guidance in
 [controller-runtime.md](skills/talk-to-my-claude/references/controller-runtime.md).
 If the host cannot retain and await one blocking receive command while allowing
 owner interruption, explain the limitation and stop the room.
+Keep the answering turn active: invitation confirmations and owner side
+requests use progress messages, followed by awaiting the retained receiver.
+Do not send a final response while sharing is active. Use the reply helper's
+`--next` option to publish and immediately await the next question.
 
 An owner request such as “Read .aiherd-talk/AGENTS.md and use it to invite guests
 to ask about the design we just discussed” activates this workflow. Stop sharing

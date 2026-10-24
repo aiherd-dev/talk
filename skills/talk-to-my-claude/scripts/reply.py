@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Publish structured stdin without shell interpolation; remove the private reply file."""
+"""Publish structured stdin; optionally replace this process with the next receive."""
 import argparse
 import csv
 import re
@@ -27,7 +27,11 @@ def main():
     parser.add_argument('--aih', default='aih')
     parser.add_argument('--socket', required=True)
     parser.add_argument('--room', required=True)
+    parser.add_argument('--next', action='store_true',
+                        help='after a successful reply, wait for the next delivery in this process')
     args = parser.parse_args()
+    if sys.stdin.isatty():
+        parser.error('supply complete reply JSON through piped or redirected stdin, not an interactive terminal')
     data = sys.stdin.buffer.read(512 * 1024 + 1)
     if len(data) > 512 * 1024:
         parser.error('reply JSON exceeds the IPC limit')
@@ -40,10 +44,20 @@ def main():
             if os.name == 'nt':
                 restrict_windows_acl(path)
             output.write(data)
-        return subprocess.run([args.aih, 'talk', 'reply', args.room, '--json-file', path,
-                               '--socket', args.socket], check=False).returncode
+        result = subprocess.run([args.aih, 'talk', 'reply', args.room, '--json-file', path,
+                                 '--socket', args.socket], check=False,
+                                stdout=subprocess.PIPE if args.next else None)
     finally:
         os.unlink(path)
+    if not args.next:
+        return result.returncode
+    if result.returncode:
+        sys.stdout.buffer.write(result.stdout)
+        return result.returncode
+    # Do not expose the acknowledgement as if it were another delivery. Remove
+    # the private file before waiting, and retain the PTY/process identity so
+    # owner cancellation reaches the receiver directly. Never retry the reply.
+    os.execvp(args.aih, [args.aih, 'talk', 'next', args.room, '--socket', args.socket])
 
 
 if __name__ == '__main__':

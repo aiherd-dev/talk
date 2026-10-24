@@ -11,7 +11,8 @@ There is one standard `aih` installation; a remote-only package is not required.
 This is a preview release. It requires an AIHerd build with `aih talk` and
 `aih status` support; standard packaged versions may predate these commands.
 The site and skill are
-available for testing, while real-Claude and native macOS acceptance remain pending.
+available for testing, while real-Claude and clean-machine installation acceptance
+remain pending.
 
 Install into the current project:
 
@@ -107,6 +108,12 @@ Claude Code remains untested in this environment.
    task completion path. Interrupt as the owner and confirm the wait exits.
 3. Ask sequential questions; follow-up answers use prior talk turns. Verify
    owner-only instructions stay local. Stop sharing and return to ordinary work.
+   Use at least two independent browser clients, with overlapping questions
+   and another idle interval after replies. Verify the agent does not end its
+   turn when a tool yields. Send an owner side request while waiting and check
+   that answering resumes without an owner “continue” prompt. The reply helper's
+   `--next` option must retain one wait, return the next delivery without the
+   preceding acknowledgement, and stop on owner cancellation.
 4. Test standard-package setup on macOS and Linux with an existing connected
    herd, a disconnected herd, and none. The skill first reads `aih status --json`
    and reuses a connected herd without installation, startup or login. Only a
@@ -133,6 +140,8 @@ do not replace native macOS/Windows installation or real-Claude acceptance.
 
 Reproduce the isolated Linux skill/helper checks with `python3 tests/check.py`
 (Node.js/npm must supply `npx`).
+Run helper lifecycle tests without a herd or model with
+`python3 -m unittest discover -s tests -p 'test_*.py' -v`.
 
 The preview site is deployed at [talk.aiherd.dev](https://talk.aiherd.dev).
 The static deployment lives on `gh-pages`; keep skill sources on `main`.
@@ -161,3 +170,31 @@ availability/context continuity, not a zero-usage indefinite background service.
 It also does not prove model-level prompt-injection resistance or native macOS/
 Windows behavior. The original Codex conversation can stay open after the
 scratch herd and relay are stopped.
+
+## Codex loop regression acceptance — macOS, 2026-10-24
+
+A real Codex CLI 0.164.0 session had left `aih talk next` running and sent a
+final response. The command retained the guest question, but the assistant did
+not read it until the owner sent another message. Starting a receiver alone
+therefore did not establish continuous answering.
+
+The skill now explicitly keeps the answering turn active, awaits retained
+execution cells/processes across tool yields, and resumes after owner side
+requests. The reply helper's `--next` option publishes once, removes its private
+file, and replaces itself with the next receive. Bare terminal stdin fails
+with instructions to pipe or redirect the complete reply JSON.
+
+Native macOS acceptance with GPT-6-Luna, low reasoning, uses a new interactive
+conversation, an isolated scratch herd and a loopback relay. Three independent
+browser clients receive five answers across two 95-second idle intervals,
+including overlapping questions and an owner side request. Original-context
+facts and follow-up answers remain available, a guest file-edit/private-note
+request is refused, browser reload preserves the ten public messages, and
+owner stop closes the room before returning to ordinary conversation. No
+owner continuation prompt is used to restart answering. Scratch classification
+is verified again after relay stats reload.
+
+This tests active-session answering, not a background service that can wake a
+finished Codex turn. The six helper lifecycle tests and project/global skill
+installation checks run separately. Claude Code, omp and OpenCode behavioral
+acceptance remain pending.
