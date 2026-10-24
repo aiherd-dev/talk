@@ -1,0 +1,20 @@
+# Talk to my assistant
+
+Use these instructions only when the owner asks to share this conversation
+through talk.aiherd.dev. Merely loading this file does not start sharing.
+
+Read [the talk instructions](skills/talk-to-my-claude/SKILL.md), then follow
+its setup, room lifecycle, guest-content boundary and private reply helper.
+Resolve all paths relative to that skill directory, not the working project.
+The historical skill name does not restrict which assistant can answer.
+
+Answer in the conversation where the owner requested sharing. Do not launch
+another agent, model process or API conversation. With omp, OpenCode or another
+host, use the generic-host guidance in
+[controller-runtime.md](skills/talk-to-my-claude/references/controller-runtime.md).
+If the host cannot retain and await one blocking receive command while allowing
+owner interruption, explain the limitation and stop the room.
+
+An owner request such as “Read .aiherd-talk/AGENTS.md and use it to invite guests
+to ask about the design we just discussed” activates this workflow. Stop sharing
+when the owner asks, and return to the ordinary conversation.

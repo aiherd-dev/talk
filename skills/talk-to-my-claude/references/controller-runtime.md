@@ -1,7 +1,7 @@
 # Waiting in the original conversation
 
 This skill uses the current agent's tools. It never launches a second model to
-answer guests. The skill's historical name works in both supported hosts.
+answer guests. The skill's historical name is retained for compatibility.
 
 ## Codex CLI
 
@@ -39,6 +39,25 @@ without an idle deadline, retain the background task ID, and await that task's
 completion. Do not launch `claude -p`, fork, resume in another process, or wake
 up to poll HTTP. Cancel that background command and stop the room when the
 owner interrupts or stops sharing.
+
+## Generic hosts, including omp and OpenCode
+
+Read the repository's AGENTS.md when the owner requests sharing in ordinary
+language. Use this conversation's shell/process tools to run `aih talk next`
+without a deadline. If the tool returns a live process or task handle, retain
+it and await completion of that same command; a tool yielding is not an empty
+question or a reason to restart the receive. If a shell tool has a default
+command timeout, use its documented long-running/background mechanism rather
+than accepting an idle timeout or inventing tool arguments.
+
+The host must allow the owner to interrupt the wait. On interruption, cancel
+the retained command and stop this room on the same socket. Never use
+`omp`, `opencode run`, a subagent or a second model session as the answering
+process. A detached shell whose output cannot be awaited by this conversation
+does not establish an unattended answering loop.
+
+omp and OpenCode examples describe loading the instructions; their real-agent
+long-wait, context-continuity and interruption acceptance remain untested.
 
 ## Unsupported runtime behavior
 

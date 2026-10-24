@@ -1,6 +1,6 @@
 # Talk to my Claude
 
-Claude Code and Codex skill for inviting trusted guests to ask questions in your existing
+Instructions for Claude Code, Codex and other coding assistants to invite trusted guests to ask questions in your existing
 conversation at talk.aiherd.dev. The broker runtime is `aih talk` in the standard
 [AIHerd distribution](https://github.com/aiherd-dev/aiherd); this repository owns
 the skill and its setup references. No second copy belongs in AIHerd.
@@ -37,6 +37,41 @@ shorthand. For example, from an isolated project directory:
 ```sh
 npx skills add /absolute/path/to/talk --skill talk-to-my-claude --agent claude-code --copy
 ```
+
+## Generic AGENTS.md instructions: omp and OpenCode
+
+Clone the instructions and their helper into your project without replacing
+its existing AGENTS.md:
+
+```sh
+git clone --depth 1 https://github.com/aiherd-dev/talk.git .aiherd-talk
+```
+
+In your **existing omp conversation**, send:
+
+```text
+Read .aiherd-talk/AGENTS.md and use it to invite guests to ask about the design we just discussed.
+```
+
+In your **existing OpenCode conversation**, send the same ordinary-language
+request. Neither example launches a second model or requires a slash command.
+Keep the checkout: its relative references and Python reply helper are required.
+To make this discoverable in future sessions, optionally append this stanza to
+your project's existing AGENTS.md:
+
+```markdown
+When I ask to share this conversation via talk.aiherd.dev, read
+.aiherd-talk/AGENTS.md and follow its instructions. Loading this rule alone
+does not start sharing.
+```
+
+Both [omp](https://github.com/can1357/oh-my-pi/blob/main/docs/context-files.md)
+and [OpenCode](https://opencode.ai/docs/rules/) support project AGENTS.md
+instructions. The generic entry point reuses the same skill, setup reference
+and reply helper as Claude Code and Codex. It requires Unix, Python 3, an AIHerd
+build with `aih talk`, and a host that can retain and await a blocking command
+while allowing owner interruption. Real omp/OpenCode runtime acceptance is
+pending; if a host cannot do this, the instructions stop the room and explain.
 
 ## Acceptance before release
 

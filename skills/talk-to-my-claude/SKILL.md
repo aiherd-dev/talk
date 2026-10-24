@@ -1,15 +1,17 @@
 ---
 name: talk-to-my-claude
-description: Enter answering mode in this existing Claude Code or Codex conversation and invite trusted guests to ask questions through talk.aiherd.dev.
+description: Enter answering mode in this existing coding-assistant conversation and invite trusted guests to ask questions through talk.aiherd.dev.
 disable-model-invocation: true
 ---
 
 Enter answering mode in **this conversation** for the owner's supplied topic.
 In Claude Code, invoke `/talk-to-my-claude <topic>`; in Codex, invoke
-`$talk-to-my-claude <topic>`. The installed name is retained for compatibility.
+`$talk-to-my-claude <topic>`. Other hosts can read the repository's AGENTS.md
+and request sharing in ordinary language. The installed name is retained for compatibility.
 Do not fork, start `claude -p`, resume the session in another process, or call a
-model API, `codex exec`, or a second Codex conversation. Answers must use the
-conversation the owner invoked this skill in.
+model API, `codex exec`, or a second assistant conversation (including a new omp
+or OpenCode session). Answers must use the conversation the owner invoked
+this skill in.
 
 1. Read [setup.md](references/setup.md). Use the existing standard `aih`
    executable and run `aih status --json` first (with the owner's `--socket`
@@ -70,5 +72,5 @@ conversation the owner invoked this skill in.
 The broker publishes completed answers, not token streams. A lost browser
 connection does not cancel a question. A failed controller command does not
 justify creating another model session. Real-agent context continuity and
-long-wait acceptance must be checked separately for Claude Code and Codex;
+long-wait acceptance must be checked separately for each host and version;
 see the repository's acceptance instructions.
