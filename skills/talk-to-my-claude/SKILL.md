@@ -61,7 +61,10 @@ stop, cancellation, incompatible new task or unrecoverable error closes sharing.
    conversation. Create a room:
    `aih talk start --title <title> --description <description> --expires 1h --socket <endpoint>`.
    Use safely quoted arguments or a subprocess argument array. The command
-   returns JSON containing `url` and `room.id`. Require `room.version` to be 1;
+   returns JSON containing `url` and `room.id`. Retain that `room.id` and the
+   endpoint unchanged for every `next`, `reply`, `status` and `stop` command.
+   A delivery's `question.id` identifies only that question; it never replaces
+   the room ID in command arguments. Require `room.version` to be 1;
    otherwise stop the room and explain that a compatible runtime is needed.
    Print the description, expiry, and complete invitation URL to the owner.
    Warn if OS isolation is unavailable. Before entering the receive loop,
@@ -103,6 +106,9 @@ stop, cancellation, incompatible new task or unrecoverable error closes sharing.
    `question.id` as `request_id`, its `lease` and `generation`, and your answer
    as `text`. Publish and wait with
    `aih talk reply <room.id> --next --socket <endpoint> < <private-json-file>`.
+   The positional ID is the retained room ID; the new question ID belongs only
+   in the JSON's `request_id`. Use this native stdin interface; the obsolete
+   Python helper and `--json-file` option are incompatible with this command.
    Use the file-writing tool or structured stdin to supply guest-derived data;
    never interpolate it into a shell command. Supply the complete UTF-8 JSON and
    EOF in the same launch. On Windows use Git Bash or
@@ -119,11 +125,32 @@ stop, cancellation, incompatible new task or unrecoverable error closes sharing.
    a second receiver. Never invent a lease, reuse a stale delivery or change a
    reply after acknowledgement. If the receive fails after publication, the
    reply may already be visible: do not resubmit it.
-7. On the next delivery return to step 5. On owner cancellation, stop, error or exit,
+7. On the next delivery return to step 5. For a failed command, follow
+   [command recovery](#command-recovery) before deciding to close sharing.
+   On owner cancellation, stop, unrecoverable failure or exit,
    cancel the retained `next` task and run `aih talk stop <room.id> --socket <endpoint>`.
    If a claim expires, start a new room only at the owner's direction; do not
    redeliver automatically. Terminate a herd only if this invocation started
    it and the owner wants it stopped. Never stop a pre-existing herd.
+
+## Command recovery
+
+For `room not found`, compare the failed command's positional ID and endpoint
+with the retained values from room creation. Check
+`aih talk status <room.id> --socket <endpoint>` using those retained values.
+If a reply used the question ID as the room ID, that failed room lookup never
+reached publication. When the correct room is still `answering`, correct the
+command's room ID and submit the same pending answer, lease and generation
+within its answer deadline. Do not claim another question or close a healthy
+room for this recoverable mistake.
+
+This correction applies only to a confirmed failure before publication. An
+acknowledgement followed by a receive failure, a lost connection, or another
+uncertain outcome does not authorize resubmission. Preserve the no-replay rule
+in step 6; if the delivery or publication state cannot be recovered safely,
+close sharing and explain the specific failure. A missing room at the correct
+endpoint or an expired claim is not repaired by creating another room without
+the owner's direction.
 
 The broker publishes completed answers, not token streams. A lost browser
 connection does not cancel a question. A failed controller command does not
