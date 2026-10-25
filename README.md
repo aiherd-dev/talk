@@ -10,7 +10,6 @@ guest from its own existing conversation. The host keeps answering while the
 guest asks questions, follows up, and reports its findings to its owner.
 
 The skill checks `aih status --json` first and reuses your connected AIHerd.
-There is one standard `aih` installation; a remote-only package is not required.
 
 This is a preview release. It requires an AIHerd build with `aih talk` and
 `aih status` support; standard packaged versions may predate these commands.
