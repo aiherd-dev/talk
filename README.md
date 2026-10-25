@@ -21,16 +21,19 @@ remain pending.
 Install into the current project:
 
 ```sh
-npx skills add aiherd-dev/talk --skill talk-to-my-claude --agent claude-code --copy
+npx skills add aiherd-dev/talk --skill talk-to-my-claude --agent '*' --copy
 ```
 
-For Codex, replace `--agent claude-code` with `--agent codex`, then invoke
+`--agent '*'` installs for every agent supported by the Skills CLI. For just
+Claude Code use `--agent claude-code`; for Codex use `--agent codex`, then invoke
 `$talk-to-my-claude <public topic>` in your existing Codex conversation. The
 historical skill name is kept for compatibility; replies come from the agent
 whose conversation you invoked it in. Codex instructions and invocation policy
 ship with the same skill directory.
 
-Append `--global` for all projects. Installation copies the entire skill directory,
+Append `--global` for all projects when the selected agent supports global skills.
+Agents limited to project skills should use the project installation above.
+Installation copies the entire skill directory,
 including references and the reply helper, without starting a room, daemon,
 login or model conversation. Invoke `/talk-to-my-claude <public topic>` in your
 existing Claude Code session. The runtime supports Unix and Windows and needs Python 3. Windows uses private
@@ -67,19 +70,36 @@ by appending “and email the invitation link to alex@example.com.”
 2. In the guest assistant's project, install the guest skill:
 
    ```sh
-   npx skills add aiherd-dev/talk --skill join-talk-room --agent codex --copy
+   npx skills add aiherd-dev/talk --skill join-talk-room --agent '*' --copy
    ```
 
-   Use `--agent claude-code` for Claude Code, or add `--global` for all projects.
+   This installs for all Skills CLI agents. To target one, use its identifier,
+   for example `codex`, `claude-code`, `opencode`, `cursor`, `gemini-cli`, `goose`
+   or `pi`. Add `--global` if that agent supports global skills.
 3. Give the guest the complete invitation and a bounded task:
 
    ```text
    $join-talk-room <invitation URL> Review the storage design; exchange at most 5 messages.
    ```
 
-   Claude Code uses `/join-talk-room` instead. For other hosts, read
-   `skills/join-talk-room/SKILL.md` from this repository and ask the existing
-   assistant to join the invitation for your task.
+   The example uses Codex syntax. Claude Code uses `/join-talk-room` instead;
+   other agents use their own skill invocation mechanism. Any assistant that
+   can read instructions, run the helper and await it can participate. For a
+   host without skill discovery, retain a clone:
+
+   ```sh
+   git clone --depth 1 https://github.com/aiherd-dev/talk.git .aiherd-talk
+   ```
+
+   Then ask the existing assistant: “Read .aiherd-talk/AGENTS.md and join
+   <invitation URL> to review the storage design; exchange at most 5 messages.”
+   This reads the same skill and helper without requiring a host-specific API.
+
+   omp also supports native skills. After cloning, copy the complete
+   `.aiherd-talk/skills/join-talk-room` directory to
+   `~/.omp/agent/skills/join-talk-room`, then invoke
+   `/skill:join-talk-room <invitation URL> <task>`. Its default native skill root
+   is documented in [omp's configuration guide](https://github.com/can1357/oh-my-pi/blob/main/docs/config-usage.md).
 
 The guest needs Node.js 22.18+ and a compatible standard AIHerd CLI supporting
 `aih expose connect`. It needs no local herd, account, pairing or sign-in.

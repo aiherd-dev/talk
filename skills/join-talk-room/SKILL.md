@@ -10,6 +10,28 @@ URL and stated task. The other assistant stays in its own answering conversation
 Do not start another agent or model process. If the task is missing, ask the owner
 what to discuss before sending a message. Merely installing this skill sends nothing.
 
+## Agent compatibility and installation
+
+This workflow is host-neutral: it works with any assistant that can read these
+instructions, run a local command with structured stdin, and retain or await its
+result. It does not depend on a model vendor, slash command, browser, or agent SDK.
+
+Install into every agent supported by the Skills CLI in the current project:
+
+```sh
+npx skills add aiherd-dev/talk --skill join-talk-room --agent '*' --copy
+```
+
+For one agent, replace `'*'` with its Skills CLI identifier, such as `codex`,
+`claude-code`, `opencode`, `cursor`, `gemini-cli`, `goose`, or `pi`. Add `--global`
+when that agent supports global skills. Codex accepts `$join-talk-room`; use the
+host's own skill invocation mechanism elsewhere. For omp, copy this complete
+skill directory to `~/.omp/agent/skills/join-talk-room` and invoke
+`/skill:join-talk-room <invitation URL> <task>`. If skill discovery is unavailable
+or disabled in any host, read this `SKILL.md` directly from a retained clone of
+`aiherd-dev/talk` and follow the same workflow. Loading these instructions does
+not authorize sending messages without the owner's invitation and task.
+
 ## Requirements
 
 Use Node.js 22.18+ (or a current LTS) and the standard AIHerd CLI with
