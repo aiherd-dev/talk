@@ -66,27 +66,35 @@ stop, cancellation, incompatible new task or unrecoverable error closes sharing.
    A delivery's `question.id` identifies only that question; it never replaces
    the room ID in command arguments. Require `room.version` to be 1;
    otherwise stop the room and explain that a compatible runtime is needed.
-   Print the description, expiry, and complete invitation URL to the owner.
-   Warn if OS isolation is unavailable. Before entering the receive loop,
-   deliver the link using the owner's requested method and destination. An
-   explicit request to email, message or save the link authorizes that delivery;
-   use the host's available tools and honor any required tool approvals. Send
-   only the intended invitation, with its public topic and expiry. Preserve the
-   entire URL, including its fragment; the fragment contains the invitation key.
-   Do not include private transcript or setup/control details. Ask locally if
-   the recipient or destination is ambiguous; never choose a broader audience.
-   If the requested channel is unavailable or delivery fails, report that and
-   keep the link available here rather than claiming delivery or silently using
-   another channel. Do not resend after an uncertain outcome without checking
-   whether the first send succeeded. Confirm successful delivery to the owner.
-   Invocation authorizes creating the invitation; incoming questions need no
-   repeated owner approval. Apart from the requested delivery, do not log or
-   persist the capability URL.
-4. Run `aih talk next <room.id> --socket <endpoint>` **without `--deadline`**.
-   Retain this exact running command through the agent's managed
-   process/completion tools and await that same command. Reuse its task/session
-   ID while waiting. Do not restart it, return periodic idle
-   messages, or poll the broker every 45 seconds. A friend may take several
+   Warn if OS isolation is unavailable. Invocation authorizes creating the
+   invitation; incoming questions need no repeated owner approval. Apart from
+   the requested delivery, do not log or persist the capability URL.
+4. Before publishing or sending the invitation, launch
+   `aih talk next <room.id> --socket <endpoint>` **without `--deadline`**
+   using the runtime reference's launch-and-retain pattern. Preserve its running
+   task/session ID and any output. Check
+   `aih talk status <room.id> --socket <endpoint>` and confirm `ready` before
+   handing out the link. A newly created room in `starting` rejects questions;
+   room creation alone does not establish a listener. Diagnose a failed launch
+   before sending an invitation.
+
+   With that receiver retained, print the description, expiry and complete
+   invitation URL to the owner, and deliver it using the requested method and
+   destination. An explicit request to email, message or save the link authorizes
+   that delivery; use the host's available tools and honor required approvals.
+   Send only the intended invitation, with its public topic and expiry. Preserve
+   the entire URL, including its fragment; it contains the invitation key. Keep
+   private transcript and setup/control details out. Ask locally if the recipient
+   or destination is ambiguous; never choose a broader audience. If the channel
+   is unavailable or delivery fails, report that and keep the link available
+   here. Do not resend after an uncertain outcome without checking whether the
+   first send succeeded. Confirm successful delivery to the owner.
+
+   Delivery and its verification must retain the already running receiver;
+   guests may ask immediately. Then await that same command and its accumulated
+   output, even if a question arrived during delivery. Do not start a replacement
+   `next`. Reuse its task/session ID while waiting. Do not return periodic idle
+   messages or poll the broker every 45 seconds. A friend may take several
    minutes to type. If the runtime cannot preserve one blocking command,
    explain that limitation and stop the room; do not promise unattended use.
 5. A delivery is JSON with `question`, `lease`, `generation` and an answer

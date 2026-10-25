@@ -12,8 +12,11 @@ ends its turn after a short command yield, a question can remain unread until
 the owner prompts it again. A live process alone does not keep Codex answering.
 
 After starting a room, use `exec_command` for `aih talk next` with `tty: true`
-and a short initial yield. Retain its returned `session_id`, then immediately
-use `write_stdin` with empty `chars` to await **that session**. Use waits of up
+and a short initial yield. Retain its returned `session_id` and initial output.
+Before handing out the invitation, check room status for `ready`, then deliver
+the invitation while preserving that receiver. Delivery verification must not
+postpone starting `next`. Afterwards use `write_stdin` with empty `chars` to
+await **that session**, including any output received during delivery. Use waits of up
 to 60 seconds, within the host's supported limits. Do not send
 newlines, spawn another `next`, or query `/messages` to poll for work. If a tool
 wait returns before completion, await the same still-running command again;
@@ -47,6 +50,22 @@ let r = await tools.exec_command({
 });
 let output = r.output;
 store(key, {session_id: r.session_id ?? null, output, exit_code: r.exit_code});
+text({session_id: r.session_id ?? null, exit_code: r.exit_code, output});
+```
+
+For the initial receive, let that launch cell complete, confirm room readiness
+and deliver the invitation now, retaining the stored handle. For replies, proceed
+directly to the wait below. If the launch cell itself yields a `cell_id`, finish
+awaiting that cell before continuing. Do not start a second receiver.
+
+Resume the saved command in a new cell after delivery:
+
+```js
+// @exec: {"yield_time_ms": 1000, "max_output_tokens": 20000}
+const key = "talk-receive-<room-id>";
+let r = load(key);
+if (!r) throw new Error("Missing retained Talk receiver");
+let output = r.output;
 while (r.session_id != null) {
   r = await tools.write_stdin({
     session_id: r.session_id, chars: "", yield_time_ms: 60000,
@@ -95,7 +114,8 @@ and the final local acknowledgement are not replies to a guest.
 ## Claude Code
 
 Use the original session's Bash background-task support. Start `aih talk next`
-without an idle deadline, retain the background task ID, and await that task's
+without an idle deadline, retain the background task ID, confirm room readiness
+and deliver the invitation before awaiting that task's
 completion. Publish using
 `aih talk reply <room.id> --next --socket <endpoint> < <private-json-file>`
 (with the Windows redirection guidance above), then await that same task for
@@ -108,7 +128,8 @@ owner cancels or stops sharing. Side requests preserve the answering loop.
 Read the repository's AGENTS.md when the owner requests sharing in ordinary
 language. Use this conversation's shell/process tools to run `aih talk next`
 without a deadline. If the tool returns a live process or task handle, retain
-it and await completion of that same command; a tool yielding is not an empty
+it, confirm room readiness and deliver the invitation, then await completion
+of that same command; a tool yielding is not an empty
 question or a reason to restart the receive. If a shell tool has a default
 command timeout, use its documented long-running/background mechanism rather
 than accepting an idle timeout or inventing tool arguments.
