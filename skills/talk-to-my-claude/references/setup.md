@@ -89,11 +89,11 @@ When the relay is already serving with valid sign-in, allow the same herd to
 reconnect and surface its reported network/admission error if it cannot. Do not
 repeat login, reinstall AIHerd or start a second herd to fix a connection error.
 
-Before creating a room, check `aih talk --help`, `aih expose list --socket
-<endpoint>` and Python 3 availability. If Python is missing, use the platform's
-normal package manager, explaining privilege prompts. The owner can instead
-supply a private JSON file directly to `aih talk reply`. All talk and exposure
-commands must use the retained endpoint. No pairing or `aih join` is required.
+Before creating a room, check `aih talk --help` and
+`aih expose list --socket <endpoint>`. Host replies use `aih talk reply` with
+complete UTF-8 JSON on redirected or piped stdin; no Python runtime is needed.
+All talk and exposure commands must use the retained endpoint. No pairing or
+`aih join` is required.
 
 For tests, use the AIHerd repository's isolated, explicitly marked scratch-herd
 rig. Never use the owner's running herd, socket, credentials or configuration as

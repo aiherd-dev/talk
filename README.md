@@ -34,10 +34,10 @@ ship with the same skill directory.
 Append `--global` for all projects when the selected agent supports global skills.
 Agents limited to project skills should use the project installation above.
 Installation copies the entire skill directory,
-including references and the reply helper, without starting a room, daemon,
+including references, without starting a room, daemon,
 login or model conversation. Invoke `/talk-to-my-claude <public topic>` in your
-existing Claude Code session. The runtime supports Unix and Windows and needs Python 3. Windows uses private
-named pipes and a supervised worker; OS isolation is unavailable there, and
+existing Claude Code session. The runtime supports Unix and Windows. Windows
+uses private named pipes and a supervised worker; OS isolation is unavailable there, and
 `--sandbox required` refuses startup.
 
 For development, install from this local repository path instead of the GitHub
@@ -126,7 +126,7 @@ the real exposure client with `python3 tests/talk_e2e.py --quick --skip-browser
 
 ## Generic AGENTS.md instructions: omp and OpenCode
 
-Clone the instructions and their helper into your project without replacing
+Clone the instructions into your project without replacing
 its existing AGENTS.md:
 
 ```sh
@@ -141,7 +141,7 @@ Read .aiherd-talk/AGENTS.md and use it to invite guests to ask about the design 
 
 In your **existing OpenCode conversation**, send the same ordinary-language
 request. Neither example launches a second model or requires a slash command.
-Keep the checkout: its relative references and Python reply helper are required.
+Keep the checkout: its relative references are required.
 To make this discoverable in future sessions, optionally append this stanza to
 your project's existing AGENTS.md:
 
@@ -153,8 +153,8 @@ does not start sharing.
 
 Both [omp](https://github.com/can1357/oh-my-pi/blob/main/docs/context-files.md)
 and [OpenCode](https://opencode.ai/docs/rules/) support project AGENTS.md
-instructions. The generic entry point reuses the same skill, setup reference
-and reply helper as Claude Code and Codex. It requires Python 3, an AIHerd
+instructions. The generic entry point reuses the same skill and setup reference
+as Claude Code and Codex. It requires an AIHerd
 build with `aih talk`, and a host that can retain and await a blocking command
 while allowing owner interruption. Real omp/OpenCode runtime acceptance is
 pending; if a host cannot do this, the instructions stop the room and explain.
@@ -179,9 +179,9 @@ Claude Code remains untested in this environment.
    Use at least two independent browser clients, with overlapping questions
    and another idle interval after replies. Verify the agent does not end its
    turn when a tool yields. Send an owner side request while waiting and check
-   that answering resumes without an owner “continue” prompt. The reply helper's
-   `--next` option must retain one wait, return the next delivery without the
-   preceding acknowledgement, and stop on owner cancellation.
+   that answering resumes without an owner “continue” prompt. The command
+   `aih talk reply --next` must retain one wait, return the next delivery without
+   the preceding acknowledgement, and stop on owner cancellation.
 4. Test standard-package setup on macOS and Linux with an existing connected
    herd, a disconnected herd, and none. The skill first reads `aih status --json`
    and reuses a connected herd without installation, startup or login. Only a
@@ -190,7 +190,8 @@ Claude Code remains untested in this environment.
 5. Test project and global Skills CLI installation on Windows, Linux and macOS,
    checking supporting resources and explicit invocation. On Windows, runtime
    setup must preserve the named-pipe endpoint, report unavailable OS isolation,
-   and refuse `required` mode. Verify private reply-file ACLs and cleanup.
+   and refuse `required` mode. Verify UTF-8 stdin redirection through cmd.exe or
+   Git Bash, including Hebrew and Arabic.
 
 The deterministic protocol and browser acceptance live in AIHerd's
 `tests/talk_e2e.py` and `talk-web/src/*.test.*`; they do not prove Claude context
@@ -200,16 +201,23 @@ around Claude's existing context or tools.
 References: [Claude skills](https://code.claude.com/docs/en/skills) and
 [Skills CLI](https://github.com/vercel-labs/skills/blob/main/docs/commands.md).
 
-Local Linux validation: the Skills CLI installed both project and global copies
-under an isolated HOME, including references and the helper, with no symlinks.
-The helper passed a literal shell-metacharacter/Unicode payload through a fake
-`aih` subprocess in a 0600 file and removed that file afterward. These checks
-do not replace native macOS/Windows installation or real-Claude acceptance.
+The host reply command reads JSON directly from stdin:
 
-Reproduce the isolated Linux skill/helper checks with `python3 tests/check.py`
-(Node.js/npm must supply `npx`).
-Run helper lifecycle tests without a herd or model with
-`python3 -m unittest discover -s tests -p 'test_*.py' -v`.
+```sh
+aih talk reply <room.id> --next --socket <endpoint> < <private-json-file>
+```
+
+Supply complete UTF-8 JSON and EOF in the same launch. On Windows use `cmd /c`
+or Git Bash for file redirection; PowerShell has no `<` operator, and Windows
+PowerShell 5.1 text pipelines can corrupt Unicode. Structured piped stdin bytes
+also work. The command publishes once, sends the acknowledgement to stderr,
+and retains one receive with only the next delivery on stdout. A failed receive
+does not resubmit the reply. No Python helper or temporary copy is used.
+
+Reproduce isolated skill installation checks with `python3 tests/check.py`
+(Node.js/npm must supply `npx`). Reply lifecycle tests live in AIHerd's
+`remote/tests/talk_transport.rs` and use private local sockets or named pipes
+without a herd or model.
 
 The preview site is deployed at [talk.aiherd.dev](https://talk.aiherd.dev).
 The static deployment lives on `gh-pages`; keep skill sources on `main`.
@@ -248,9 +256,9 @@ therefore did not establish continuous answering.
 
 The skill now explicitly keeps the answering turn active, awaits retained
 execution cells/processes across tool yields, and resumes after owner side
-requests. The reply helper's `--next` option publishes once, removes its private
-file, and replaces itself with the next receive. Bare terminal stdin fails
-with instructions to pipe or redirect the complete reply JSON.
+requests. The former reply helper used `--next` to publish once and replace
+itself with the next receive; this is now built into `aih talk reply --next`.
+Bare terminal stdin fails with instructions to pipe or redirect the complete reply JSON.
 
 Native macOS acceptance with GPT-6-Luna, low reasoning, uses a new interactive
 conversation, an isolated scratch herd and a loopback relay. Three independent
@@ -263,6 +271,6 @@ owner continuation prompt is used to restart answering. Scratch classification
 is verified again after relay stats reload.
 
 This tests active-session answering, not a background service that can wake a
-finished Codex turn. The six helper lifecycle tests and project/global skill
-installation checks run separately. Claude Code, omp and OpenCode behavioral
-acceptance remain pending.
+finished Codex turn. Reply lifecycle tests now live in AIHerd; project/global
+skill installation checks run separately. Claude Code, omp and OpenCode
+behavioral acceptance remain pending.

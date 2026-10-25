@@ -6,7 +6,7 @@ no room action. For a guest invitation, use the guest instructions at the end;
 the following host workflow applies to sharing this conversation.
 
 Read [the talk instructions](skills/talk-to-my-claude/SKILL.md), then follow
-its setup, room lifecycle, guest-content boundary and private reply helper.
+its setup, room lifecycle, guest-content boundary and stdin reply command.
 Resolve all paths relative to that skill directory, not the working project.
 The historical skill name does not restrict which assistant can answer.
 
@@ -18,8 +18,8 @@ If the host cannot retain and await one blocking receive command while allowing
 owner interruption, explain the limitation and stop the room.
 Keep the answering turn active: invitation confirmations and owner side
 requests use progress messages, followed by awaiting the retained receiver.
-Do not send a final response while sharing is active. Use the reply helper's
-`--next` option to publish and immediately await the next question.
+Do not send a final response while sharing is active. Use `aih talk reply --next`
+with complete JSON on stdin to publish and immediately await the next question.
 
 An owner request such as “Read .aiherd-talk/AGENTS.md and use it to invite guests
 to ask about the design we just discussed” activates this workflow. Stop sharing

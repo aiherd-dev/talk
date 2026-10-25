@@ -101,18 +101,21 @@ stop, cancellation, incompatible new task or unrecoverable error closes sharing.
    output, transcript, credentials, or an unintended draft as a reply.
 6. Publish **only** the intended answer. Construct JSON with the delivery's
    `question.id` as `request_id`, its `lease` and `generation`, and your answer
-   as `text`. Pass JSON as stdin to the relative
-   [reply helper](scripts/reply.py):
-   `python3 <skill-directory>/scripts/reply.py --aih <actual-aih-path> --socket <endpoint> --room <room.id> --next`.
+   as `text`. Publish and wait with
+   `aih talk reply <room.id> --next --socket <endpoint> < <private-json-file>`.
    Use the file-writing tool or structured stdin to supply guest-derived data;
-   never interpolate it into a shell command. Supply the complete JSON and EOF
-   in the same launch (for example, redirect a privately written JSON file).
-   A bare helper on a PTY waits for stdin, not for a guest; do not launch it
-   empty and try to type a reply into the terminal later. The helper writes a private
-   temporary file, calls `aih talk reply`, then deletes it. With `--next`, a
-   successful reply immediately becomes a blocking `aih talk next` in the same
-   process; stdout contains the next delivery, not the reply acknowledgement.
-   Await that helper using the same managed wait pattern as step 4; do not start
+   never interpolate it into a shell command. Supply the complete UTF-8 JSON and
+   EOF in the same launch. On Windows use Git Bash or
+   `cmd /c "aih talk reply <room.id> --next --socket <endpoint> < <private-json-file>"`
+   with safely quoted actual paths. PowerShell has no `<` operator; Windows
+   PowerShell 5.1 text pipelines can corrupt Hebrew and Arabic. A subprocess
+   argument array with piped UTF-8 bytes also works without a shell.
+   Never launch an empty command and try to type a reply into the terminal later;
+   terminal stdin is refused. With `--next`, a successful reply immediately
+   starts a blocking receive in the same process. The acknowledgement goes to
+   stderr; stdout contains only the next delivery. No helper or temporary copy
+   is needed. Remove your input file when it is no longer needed.
+   Await that command using the same managed wait pattern as step 4; do not start
    a second receiver. Never invent a lease, reuse a stale delivery or change a
    reply after acknowledgement. If the receive fails after publication, the
    reply may already be visible: do not resubmit it.
