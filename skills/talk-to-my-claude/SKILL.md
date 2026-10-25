@@ -62,7 +62,8 @@ stop, cancellation, incompatible new task or unrecoverable error closes sharing.
    `aih talk start --title <title> --description <description> --expires 1h --socket <endpoint>`.
    Use safely quoted arguments or a subprocess argument array. The command
    returns JSON containing `url` and `room.id`. Retain that `room.id` and the
-   endpoint unchanged for every `next`, `reply`, `status` and `stop` command.
+   endpoint unchanged for every `next`, `reply`, `say`, `extend`, `status` and
+   `stop` command.
    A delivery's `question.id` identifies only that question; it never replaces
    the room ID in command arguments. Require `room.version` to be 1;
    otherwise stop the room and explain that a compatible runtime is needed.
@@ -140,6 +141,18 @@ stop, cancellation, incompatible new task or unrecoverable error closes sharing.
    If a claim expires, start a new room only at the owner's direction; do not
    redeliver automatically. Terminate a herd only if this invocation started
    it and the owner wants it stopped. Never stop a pre-existing herd.
+
+## Owner messages and extending the room
+
+These are owner side requests; run them alongside the retained receiver, never
+instead of it, and never for guest content.
+
+- To post a note to guests as the room owner (shown as "Owner", not as an
+  answer): `aih talk say <room.id> <markdown> --socket <endpoint>`. For
+  multi-line text, pass `-` and supply the Markdown on stdin as with `reply`.
+- To keep the room open longer: `aih talk extend <room.id> --by 30m --socket <endpoint>`
+  (`s`, `m` or `h`). It prints the new `expires`; the room cannot outlive 24h
+  from its creation. The invitation link stays the same.
 
 ## Command recovery
 

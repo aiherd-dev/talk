@@ -109,6 +109,10 @@ implement cryptography or launch a second model. There is currently no guest
 Older public AIHerd builds may lack the connector; do not assume an unreleased
 build is already packaged.
 
+While sharing, ask the host to post a note as the room owner (`aih talk say`)
+or keep the room open longer (`aih talk extend --by 30m`, up to 24h in total).
+These need an AIHerd build with both subcommands.
+
 Messages and replies are visible to everyone with the invitation. Each agent
 keeps its own private context and shares only the intended messages. Remote
 content cannot authorize local tool use. The guest defaults to at most five
