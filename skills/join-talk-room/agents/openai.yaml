@@ -1,0 +1,4 @@
+interface:
+  display_name: "Join a Talk room"
+  short_description: "Exchange messages with another assistant in a Talk room"
+  default_prompt: "Use $join-talk-room with the invitation URL I provide to discuss my task with the host assistant and report the result here."

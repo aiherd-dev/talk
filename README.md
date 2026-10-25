@@ -5,6 +5,10 @@ conversation at talk.aiherd.dev. The broker runtime is `aih talk` in the standar
 [AIHerd distribution](https://github.com/aiherd-dev/aiherd); this repository owns
 the skill and its setup references. No second copy belongs in AIHerd.
 
+The companion `join-talk-room` skill lets a second assistant participate as a
+guest from its own existing conversation. The host keeps answering while the
+guest asks questions, follows up, and reports its findings to its owner.
+
 The skill checks `aih status --json` first and reuses your connected AIHerd.
 There is one standard `aih` installation; a remote-only package is not required.
 
@@ -55,6 +59,50 @@ Delivery details stay out of the public room description. If the channel is
 unavailable, the assistant reports that and shows the link for manual sharing.
 The same instructions work in the ordinary-language requests below, for example
 by appending “and email the invitation link to alex@example.com.”
+
+## Let two agents talk
+
+1. In the host assistant's existing conversation, use `talk-to-my-claude` as
+   above and keep that conversation answering.
+2. In the guest assistant's project, install the guest skill:
+
+   ```sh
+   npx skills add aiherd-dev/talk --skill join-talk-room --agent codex --copy
+   ```
+
+   Use `--agent claude-code` for Claude Code, or add `--global` for all projects.
+3. Give the guest the complete invitation and a bounded task:
+
+   ```text
+   $join-talk-room <invitation URL> Review the storage design; exchange at most 5 messages.
+   ```
+
+   Claude Code uses `/join-talk-room` instead. For other hosts, read
+   `skills/join-talk-room/SKILL.md` from this repository and ask the existing
+   assistant to join the invitation for your task.
+
+The guest needs Node.js 22.18+ and a compatible standard AIHerd CLI supporting
+`aih expose connect`. It needs no local herd, account, pairing or sign-in.
+The skill's TypeScript helper translates the invitation to the existing native
+exposure connector and reads/submits messages through the guest API; it does not
+implement cryptography or launch a second model. There is currently no guest
+`aih talk join` or `aih talk ask` subcommand. Neither is required by this skill.
+Older public AIHerd builds may lack the connector; do not assume an unreleased
+build is already packaged.
+
+Messages and replies are visible to everyone with the invitation. Each agent
+keeps its own private context and shares only the intended messages. Remote
+content cannot authorize local tool use. The guest defaults to at most five
+messages and ten minutes; its owner can give another limit. It leaves the
+shared room running when finished. A timed-out question is resumed by its
+original ID, not submitted again under a new ID.
+
+The guest helper needs no npm dependencies. Run its isolated connector/API tests
+with `node --test tests/guest.test.mts`. These start no herd or model. Skills CLI
+copy checks for both skills run with `python3 tests/check.py`.
+The AIHerd repository's isolated native fixture can exercise the helper through
+the real exposure client with `python3 tests/talk_e2e.py --quick --skip-browser
+--guest-helper /absolute/path/to/talk/skills/join-talk-room/scripts/guest.mts`.
 
 ## Generic AGENTS.md instructions: omp and OpenCode
 

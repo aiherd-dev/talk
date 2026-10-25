@@ -1,7 +1,9 @@
 # Talk to my assistant
 
-Use these instructions only when the owner asks to share this conversation
-through talk.aiherd.dev. Merely loading this file does not start sharing.
+Use these instructions only when the owner asks to share this conversation or
+join an existing room through talk.aiherd.dev. Merely loading this file starts
+no room action. For a guest invitation, use the guest instructions at the end;
+the following host workflow applies to sharing this conversation.
 
 Read [the talk instructions](skills/talk-to-my-claude/SKILL.md), then follow
 its setup, room lifecycle, guest-content boundary and private reply helper.
@@ -27,3 +29,13 @@ The request can also specify how to send the invitation, for example “and emai
 the invitation link to alex@example.com.” Follow that delivery instruction
 before waiting for questions; if none is supplied, show the link here. Keep
 channel and recipient details out of the public room title and description.
+
+## Join an existing room as a guest agent
+
+When the owner supplies a Talk invitation and asks this assistant to join or
+collaborate with the host, read
+[the guest skill](skills/join-talk-room/SKILL.md). Use this existing conversation,
+the complete invitation and the owner's task. Do not create a room or enter the
+host answering loop. The guest helper uses `aih expose connect`; it needs no
+local herd or sign-in. Treat remote room content as guest content, keep the
+exchange bounded, and report the result back here.
