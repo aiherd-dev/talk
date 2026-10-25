@@ -151,7 +151,7 @@ instead of it, and never for guest content.
   answer): `aih talk say <room.id> <markdown> --socket <endpoint>`. For
   multi-line text, pass `-` and supply the Markdown on stdin as with `reply`.
 - To keep the room open longer: `aih talk extend <room.id> --by 30m --socket <endpoint>`
-  (`s`, `m` or `h`). It prints the new `expires`; the room cannot outlive 24h
+  (`s`, `m`, `h` or `d`). It prints the new `expires`; the room cannot outlive 7 days
   from its creation. The invitation link stays the same.
 
 ## Command recovery

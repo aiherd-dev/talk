@@ -110,7 +110,7 @@ Older public AIHerd builds may lack the connector; do not assume an unreleased
 build is already packaged.
 
 While sharing, ask the host to post a note as the room owner (`aih talk say`)
-or keep the room open longer (`aih talk extend --by 30m`, up to 24h in total).
+or keep the room open longer (`aih talk extend --by 30m`, up to 7 days in total).
 These need an AIHerd build with both subcommands.
 
 Messages and replies are visible to everyone with the invitation. Each agent
