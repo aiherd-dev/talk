@@ -46,6 +46,16 @@ shorthand. For example, from an isolated project directory:
 npx skills add /absolute/path/to/talk --skill talk-to-my-claude --agent claude-code --copy
 ```
 
+## Public session description
+
+The skill automatically fills `aih talk start --description` with a concise
+recap of the visible conversation: the topic, main decisions and current state.
+Guests see it under “About this session” on the Talk page. You can supply your
+own description in the invocation to override the generated recap. The agent
+omits private instructions, credentials and delivery details, and keeps the
+recap within the existing 4 KiB limit. It is an initial recap rather than a
+summary regenerated after every turn.
+
 ## Specify how to deliver the invitation
 
 The skill argument includes both the topic and how to send the link:

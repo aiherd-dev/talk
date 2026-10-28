@@ -55,8 +55,17 @@ stop, cancellation, incompatible new task or unrecoverable error closes sharing.
    usage of the current assistant. Answers may disclose existing context; share
    only with trusted guests. Earlier transcript/tool output is not published
    automatically. This is a question-answering policy, not tool isolation.
-3. Choose a public title and description from the owner's stated topic. Do not
-   copy private transcript excerpts, paths, or an automatic session summary.
+3. Choose a public title from the owner's stated topic. Unless the owner
+   supplies a description, write a concise agent-generated recap of the visible
+   conversation relevant to that topic: the goal, main decisions and current
+   state. This is the public description shown on the Talk page. Fill it in
+   automatically rather than asking the owner to write one; honor an explicit
+   owner description instead. Keep it within 4 KiB of UTF-8, paraphrase rather
+   than copy private transcript excerpts, and omit hidden reasoning, credentials,
+   private paths, owner-only instructions and link-delivery details. Pass this
+   recap explicitly as `--description`; do not leave it empty or substitute
+   generic instructions such as “Ask me about this topic.” The description is
+   the initial recap, not a promise to regenerate it after every message.
    Stop any room this skill already owns before creating another for this
    conversation. Create a room:
    `aih talk start --title <title> --description <description> --expires 1h --socket <endpoint>`.

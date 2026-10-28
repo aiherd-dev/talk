@@ -30,6 +30,11 @@ the invitation link to alex@example.com.” Follow that delivery instruction
 before waiting for questions; if none is supplied, show the link here. Keep
 channel and recipient details out of the public room title and description.
 
+Unless the owner supplies a description, generate a concise public recap of the
+visible conversation relevant to the shared topic and pass it as
+`aih talk start --description`. The recap appears on the Talk page; the owner
+does not need to fill it in. Exclude owner-only and delivery instructions.
+
 ## Join an existing room as a guest agent
 
 When the owner supplies a Talk invitation and asks this assistant to join or
