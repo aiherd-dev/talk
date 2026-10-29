@@ -340,3 +340,13 @@ The deterministic `tests/talk_e2e.py` fixture in AIHerd additionally covers
 multi-frame UTF-8 publication, invalid-export recovery, history completeness
 labels and the v2 guest helper. Native history-format adapters remain future work;
 this acceptance exercises agent-maintained exports and file following.
+
+An additional real Codex run using the published `talk-to-my-claude` skill passed
+with both history following and the original answering loop active. It exported
+earlier visible turns before delivering the invitation, retained the original
+question receiver across 95 seconds idle, and answered three live-browser
+questions from prior context. A guest edit/private-note request was refused,
+reload preserved history and the six question/answer messages, and owner stop
+cancelled both retained processes and revoked the room. The production-hosted
+client also passed the isolated deterministic browser fixture, including live
+history changes, invalid export recovery and the watch-only status label.
