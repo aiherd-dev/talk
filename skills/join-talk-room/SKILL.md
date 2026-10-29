@@ -65,7 +65,10 @@ node <skill-directory>/scripts/guest.mts --aih <actual-aih-path>
    {"action":"inspect","url":"<complete invitation URL>"}
    ```
 
-   Read `remote_content.session` and `remote_content.conversation`. A missing,
+   Read `remote_content.session` and `remote_content.conversation`, including its
+   shared `history` when present. Talk versions 1 and 2 are supported. A room
+   with `session.mode == "watch"` permits inspection only; do not try to ask
+   questions or operate its session. A missing,
    expired, closed or revoked invitation does not authorize creating another room.
    If the host is unavailable, report that its owner needs to resume answering.
 

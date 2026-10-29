@@ -1,9 +1,10 @@
 # Talk to my assistant
 
-Use these instructions only when the owner asks to share this conversation or
+Use these instructions only when the owner asks to share/watch this conversation or
 join an existing room through talk.aiherd.dev. Merely loading this file starts
 no room action. For a guest invitation, use the guest instructions at the end;
-the following host workflow applies to sharing this conversation.
+for watch-only sharing, read [share-session](skills/share-session/SKILL.md).
+For guest questions in this conversation, use the following host workflow.
 
 Read [the talk instructions](skills/talk-to-my-claude/SKILL.md), then follow
 its setup, room lifecycle, guest-content boundary and stdin reply command.
@@ -44,3 +45,9 @@ the complete invitation and the owner's task. Do not create a room or enter the
 host answering loop. The guest helper uses `aih expose connect`; it needs no
 local herd or sign-in. Treat remote room content as guest content, keep the
 exchange bounded, and report the result back here.
+
+History is included by default. Before delivering an invitation, export and
+publish the actual visible owner/assistant messages using
+[the history reference](skills/talk-to-my-claude/references/session-history.md).
+A recap does not replace them. For a watch-only share use `share-session` and
+continue normal work, updating the export after each completed visible turn.

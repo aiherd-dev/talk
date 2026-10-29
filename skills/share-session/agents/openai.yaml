@@ -1,0 +1,6 @@
+interface:
+  display_name: "Share session"
+  short_description: "Share visible history and live updates with watch-only guests"
+  default_prompt: "Use $share-session to share this conversation's history and live updates for the topic I provide."
+policy:
+  allow_implicit_invocation: false

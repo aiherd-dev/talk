@@ -53,9 +53,13 @@ stop, cancellation, incompatible new task or unrecoverable error closes sharing.
 2. Explain that one invitation is one room; everyone holding it can read and
    contribute. This session enters answering mode and the owner pays normal
    usage of the current assistant. Answers may disclose existing context; share
-   only with trusted guests. Earlier transcript/tool output is not published
-   automatically. This is a question-answering policy, not tool isolation.
-3. Choose a public title from the owner's stated topic. Unless the owner
+   only with trusted guests. Tool output is not published
+   as raw logs. The shared page does include the visible session history
+   prepared under the history reference below. This is a question-answering
+   policy, not tool isolation.
+3. Read [session-history.md](references/session-history.md), prepare the visible
+   history export and check `aih talk session --help`. Share history by default.
+   Choose a public title from the owner's stated topic. Unless the owner
    supplies a description, write a concise agent-generated recap of the visible
    conversation relevant to that topic: the goal, main decisions and current
    state. This is the public description shown on the Talk page. Fill it in
@@ -68,18 +72,20 @@ stop, cancellation, incompatible new task or unrecoverable error closes sharing.
    the initial recap, not a promise to regenerate it after every message.
    Stop any room this skill already owns before creating another for this
    conversation. Create a room:
-   `aih talk start --title <title> --description <description> --expires 1h --socket <endpoint>`.
+   `aih talk start --title <title> --description <description> --history all --expires 1h --socket <endpoint>`.
    Use safely quoted arguments or a subprocess argument array. The command
    returns JSON containing `url` and `room.id`. Retain that `room.id` and the
    endpoint unchanged for every `next`, `reply`, `say`, `extend`, `status` and
    `stop` command.
    A delivery's `question.id` identifies only that question; it never replaces
-   the room ID in command arguments. Require `room.version` to be 1;
+   the room ID in command arguments. Require `room.version` to be 2 for shared history (1 only for an explicit
+   `--history none` room);
    otherwise stop the room and explain that a compatible runtime is needed.
    Warn if OS isolation is unavailable. Invocation authorizes creating the
    invitation; incoming questions need no repeated owner approval. Apart from
    the requested delivery, do not log or persist the capability URL.
-4. Before publishing or sending the invitation, launch
+4. Publish the prepared history and retain its file follower as described in
+   the history reference. Then, before sending the invitation, launch
    `aih talk next <room.id> --socket <endpoint>` **without `--deadline`**
    using the runtime reference's launch-and-retain pattern. Preserve its running
    task/session ID and any output. Check
@@ -146,7 +152,7 @@ stop, cancellation, incompatible new task or unrecoverable error closes sharing.
 7. On the next delivery return to step 5. For a failed command, follow
    [command recovery](#command-recovery) before deciding to close sharing.
    On owner cancellation, stop, unrecoverable failure or exit,
-   cancel the retained `next` task and run `aih talk stop <room.id> --socket <endpoint>`.
+   cancel the retained history follower and `next` task and run `aih talk stop <room.id> --socket <endpoint>`.
    If a claim expires, start a new room only at the owner's direction; do not
    redeliver automatically. Terminate a herd only if this invocation started
    it and the owner wants it stopped. Never stop a pre-existing herd.

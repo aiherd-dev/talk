@@ -221,7 +221,7 @@ export async function runGuest(
   const input = parseRequest(raw);
   return withBridge(input.url, aih, signal, async (base) => {
     const session = await request(base, "/session", signal);
-    if (session.version !== 1) throw new Error("Unsupported room version");
+    if (session.version !== 1 && session.version !== 2) throw new Error("Unsupported room version");
     if (input.action === "inspect")
       return {
         status: "ok",
@@ -233,6 +233,7 @@ export async function runGuest(
     const id = input.id ?? randomBytes(16).toString("hex");
     let receipt: ObjectValue | undefined;
     if (input.action === "ask") {
+      if (session.mode === "watch") throw new Error("This session is watch only; inspect its shared history instead of asking a question");
       if (!["ready", "answering"].includes(String(session.state)))
         return { status: String(session.state), id };
       const limits = object(session.limits);

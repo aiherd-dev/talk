@@ -46,6 +46,36 @@ shorthand. For example, from an isolated project directory:
 npx skills add /absolute/path/to/talk --skill talk-to-my-claude --agent claude-code --copy
 ```
 
+## Share full visible history and live updates
+
+For watch-only sharing while you continue working:
+
+```sh
+npx skills add aiherd-dev/talk --skill share-session --agent codex --copy
+```
+
+Invoke `$share-session <topic and link-delivery instructions>` in your existing
+Codex conversation, or install for Claude Code and invoke `/share-session`.
+The skill exports the available visible owner/assistant messages, generates the
+public recap, creates a watch-only room and follows its export file. New exported
+turns appear on the open page without a refresh. Guests need no name or account
+and cannot submit questions in watch mode.
+
+`talk-to-my-claude` also publishes history by default and retains its separate
+guest question/answer loop. Use `--history none` only when explicitly requesting
+a legacy question-only room. Both workflows require a gateway build with
+`aih talk session` and a Talk v2 client; update the gateway as well as the skill.
+Existing invitations from older gateways keep their original scope.
+
+History comes from an explicit agent-maintained JSON export, with stable message
+IDs, revisions and a completeness indicator. Hidden reasoning, tool results,
+owner-only material and delivery details are excluded. Earlier messages lost to
+compaction are identified as unavailable. The 4 MiB export limit fails explicitly
+rather than silently truncating. The agent updates the export after new visible
+turns; the follower watches the file without invoking a model.
+
+See [the export format and lifecycle](skills/talk-to-my-claude/references/session-history.md).
+
 ## Public session description
 
 The skill automatically fills `aih talk start --description` with a concise
@@ -287,3 +317,26 @@ This tests active-session answering, not a background service that can wake a
 finished Codex turn. Reply lifecycle tests now live in AIHerd; project/global
 skill installation checks run separately. Claude Code, omp and OpenCode
 behavioral acceptance remain pending.
+
+## Session history acceptance on Linux 2026-10-29
+
+Passed with a real Codex CLI 0.165.0 / GPT-6.1-Sol conversation, the local
+candidate `share-session` skill and a marked, isolated scratch herd on a loopback
+relay. Original visible owner and assistant turns were exported with stable IDs;
+a private owner-note canary was absent. An ordinary later work request updated
+the open production-built page with both new turns without a publishing reminder.
+The publisher remained live for at least 95 seconds with no question receiver.
+Watch mode required no join/name, rejected guest POSTs, and replayed history
+without duplicates after reload. Owner stop revoked the room, ended the follower
+and removed its private export. Scratch classification was verified before and
+after relay stats persistence/reload; all fixture processes were stopped.
+
+The first attempt selected an older installed CLI from the host's login-shell
+PATH. The skill correctly refused to create a room without history support.
+Selecting the candidate executable explicitly completed acceptance. Update the
+CLI and its running gateway together; a skill update alone is insufficient.
+
+The deterministic `tests/talk_e2e.py` fixture in AIHerd additionally covers
+multi-frame UTF-8 publication, invalid-export recovery, history completeness
+labels and the v2 guest helper. Native history-format adapters remain future work;
+this acceptance exercises agent-maintained exports and file following.
